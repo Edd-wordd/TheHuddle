@@ -1,17 +1,4 @@
 import * as React from 'react'
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { auth } from '../../firebase/firebase'
-import {
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-  signInWithPopup,
-  createUserWithEmailAndPassword,
-  updateProfile,
-  sendEmailVerification,
-  signOut,
-} from 'firebase/auth'
-import { collection, query, where, getDocs, doc, setDoc, serverTimestamp } from 'firebase/firestore'
 import {
   Box,
   Typography,
@@ -31,7 +18,6 @@ import GoogleIcon from '@mui/icons-material/Google'
 import FacebookIcon from '@mui/icons-material/Facebook'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import Footer from '../layout/Footer'
-import { firestore } from '../../firebase/firebase'
 import { glassyCard, mainBackground } from '../../styles/adminStyles'
 
 const glassAuthCard = {
@@ -64,180 +50,6 @@ const inputSx = {
 }
 
 export default function SignUp() {
-  const navigate = useNavigate()
-  const [userCredentials, setUserCredentials] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-  })
-  const [errors, setErrors] = useState({ email: '', password: '', lastName: '', firstName: '' })
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
-  const [isSocialMediaSigningIn, setIsSocialMediaSigningIn] = useState(false)
-  const [emailSentAlert, setEmailSentAlert] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-
-  useEffect(() => {
-    const { firstName, lastName, email, password } = userCredentials
-    const hasErrors = !!errors.firstName || !!errors.lastName || !!errors.email || !!errors.password
-    const allFieldsFilled = firstName && lastName && email && password
-    setIsSubmitDisabled(hasErrors || !allFieldsFilled)
-  }, [userCredentials, errors])
-
-  useEffect(() => {
-    let timer
-    if (errorMessage) {
-      timer = setTimeout(() => {
-        setErrorMessage('')
-      }, 3000)
-    }
-    return () => clearTimeout(timer)
-  }, [errorMessage])
-
-  const handleGoogleSignIn = async (e) => {
-    e.preventDefault()
-    setIsSocialMediaSigningIn(true)
-    const provider = new GoogleAuthProvider()
-    try {
-      const result = await signInWithPopup(auth, provider)
-      console.log('Google sign-in result:', result)
-      navigate('/dashboard')
-    } catch (error) {
-      console.error('Error during sign-in with popup:', error)
-      setErrorMessage('Error during sign-in. Please try again.')
-      setIsSocialMediaSigningIn(false)
-    }
-  }
-
-  const handleFacebookSignIn = async (e) => {
-    e.preventDefault()
-    setIsSocialMediaSigningIn(true)
-    const provider = new FacebookAuthProvider()
-    try {
-      const result = await signInWithPopup(auth, provider)
-      console.log('Facebook sign-in result:', result)
-      navigate('/dashboard')
-    } catch (error) {
-      console.error('Error during sign-in with popup:', error)
-      setErrorMessage('Error during sign-in. Please try again.')
-      setIsSocialMediaSigningIn(false)
-    }
-  }
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
-
-    setUserCredentials((prev) => {
-      const updatedCredentials = { ...prev, [name]: value.trim() }
-
-      if (name === 'email') {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          email: emailRegex.test(value) ? '' : 'Invalid email format',
-        }))
-      }
-
-      if (name === 'firstName' || name === 'lastName') {
-        const nameRegex = /^[a-zA-Z\s]+$/
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          [name]: nameRegex.test(value) ? '' : 'Invalid name format',
-        }))
-      }
-
-      if (name === 'password') {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          password: passwordRegex.test(value)
-            ? ''
-            : 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-        }))
-      }
-      return updatedCredentials
-    })
-  }
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    const { firstName, lastName, email, password } = userCredentials
-
-    setIsSubmitting(true)
-
-    if (errors.email || errors.firstName || errors.lastName) {
-      console.log('Invalid form')
-      setIsSubmitting(false)
-      return
-    }
-
-    try {
-      // First check if email exists in Firestore
-      const q = query(collection(firestore, 'users'), where('email', '==', email))
-      const querySnapshot = await getDocs(q)
-      if (!querySnapshot.empty) {
-        setErrorMessage('Email already in use.')
-        setIsSubmitting(false)
-        return
-      }
-
-      // Create authentication user
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-      const user = userCredential.user
-
-      // Update user profile
-      await updateProfile(user, { displayName: `${firstName} ${lastName}` })
-
-      // Save user data to Firestore
-      try {
-        await setDoc(doc(firestore, 'users', user.uid), {
-          firstName,
-          lastName,
-          email,
-          createdAt: serverTimestamp(),
-          uid: user.uid,
-          role: 'user',
-        })
-      } catch (firestoreError) {
-        console.error('Error saving to Firestore:', firestoreError)
-        // If Firestore save fails, delete the auth user to maintain consistency
-        await user.delete()
-        throw new Error('Failed to save user data')
-      }
-
-      // Send verification email
-      await sendEmailVerification(user)
-
-      setUserCredentials({ firstName: '', lastName: '', email: '', password: '' })
-      setEmailSentAlert(true)
-
-      // Sign out the user after sending the email verification
-      await signOut(auth)
-
-      setTimeout(() => {
-        setEmailSentAlert(false)
-        navigate('/signin') // Redirect to the sign-in page
-      }, 3000)
-    } catch (error) {
-      console.error('Signup error:', error)
-      if (error.code === 'auth/email-already-in-use') {
-        setErrorMessage('Email already in use.')
-      } else if (error.code === 'auth/invalid-email') {
-        setErrorMessage('Invalid email address.')
-      } else if (error.code === 'auth/weak-password') {
-        setErrorMessage('Password is too weak. Need at least 6 characters.')
-      } else if (error.message === 'Failed to save user data') {
-        setErrorMessage('Error creating account. Please try again.')
-      } else {
-        setErrorMessage('Error signing up. Please try again.')
-      }
-    }
-
-    setIsSubmitting(false)
-  }
-
   return (
     <Box
       sx={{
@@ -259,7 +71,7 @@ export default function SignUp() {
           zIndex: (theme) => theme.zIndex.drawer + 1,
           bgcolor: 'rgba(0,0,0,0.6)',
         }}
-        open={isSubmitting || isSocialMediaSigningIn}
+        open={false}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -308,8 +120,8 @@ export default function SignUp() {
           </Typography>
         </Stack>
 
-        <Box component="form" noValidate onSubmit={handleSubmit}>
-          {errorMessage && (
+        <Box component="form" noValidate onSubmit={() => {}}>
+          {false && (
             <Alert
               severity="error"
               sx={{
@@ -320,10 +132,10 @@ export default function SignUp() {
                 border: '1px solid rgba(255,82,82,0.2)',
               }}
             >
-              {errorMessage}
+              {false}
             </Alert>
           )}
-          {emailSentAlert && (
+          {false && (
             <Alert
               severity="success"
               sx={{
@@ -334,7 +146,7 @@ export default function SignUp() {
                 border: '1px solid rgba(0,200,83,0.2)',
               }}
             >
-              Email verification has been sent. Please check your email.
+              {false}
             </Alert>
           )}
 
@@ -350,10 +162,10 @@ export default function SignUp() {
                 autoFocus
                 variant="outlined"
                 size="small"
-                onChange={handleChange}
-                helperText={errors.firstName}
-                error={!!errors.firstName}
-                value={userCredentials.firstName}
+                onChange={() => {}}
+                helperText={false}
+                error={false}
+                value={false}
                 sx={inputSx}
               />
             </Grid>
@@ -367,10 +179,10 @@ export default function SignUp() {
                 autoComplete="family-name"
                 variant="outlined"
                 size="small"
-                onChange={handleChange}
-                helperText={errors.lastName}
-                error={!!errors.lastName}
-                value={userCredentials.lastName}
+                onChange={() => {}}
+                helperText={false}
+                error={false}
+                value={false}
                 sx={inputSx}
               />
             </Grid>
@@ -385,10 +197,10 @@ export default function SignUp() {
                 autoComplete="email"
                 variant="outlined"
                 size="small"
-                onChange={handleChange}
-                helperText={errors.email}
-                error={!!errors.email}
-                value={userCredentials.email}
+                onChange={() => {}}
+                helperText={false}
+                error={false}
+                value={false}
                 sx={inputSx}
               />
             </Grid>
@@ -398,26 +210,26 @@ export default function SignUp() {
                 fullWidth
                 name="password"
                 label="Password"
-                type={showPassword ? 'text' : 'password'}
+                type={false ? 'text' : 'password'}
                 id="password"
                 autoComplete="new-password"
                 variant="outlined"
                 size="small"
-                onChange={handleChange}
-                helperText={errors.password}
-                error={!!errors.password}
-                value={userCredentials.password}
+                onChange={() => {}}
+                helperText={false}
+                error={false}
+                value={false}
                 sx={inputSx}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
                         aria-label="toggle password visibility"
-                        onClick={() => setShowPassword(!showPassword)}
+                        onClick={() => {}}
                         edge="end"
                         sx={{ color: 'rgba(233,236,245,0.6)' }}
                       >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                        {false ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -431,7 +243,7 @@ export default function SignUp() {
             fullWidth
             variant="contained"
             size="medium"
-            disabled={isSubmitDisabled || isSubmitting}
+            disabled={false}
             sx={{
               mt: 2,
               py: 1.25,
@@ -452,15 +264,10 @@ export default function SignUp() {
               },
             }}
           >
-            {isSubmitting ? 'Creating account...' : 'Create account'}
+            {false ? 'Creating account...' : 'Create account'}
           </Button>
 
-          <Stack
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-            sx={{ mt: 2 }}
-          >
+          <Stack direction="row" justifyContent="center" alignItems="center" sx={{ mt: 2 }}>
             <Link
               href="/signin"
               variant="body2"
@@ -477,7 +284,10 @@ export default function SignUp() {
 
           <Stack direction="row" alignItems="center" spacing={1.5} sx={{ my: 2 }}>
             <Box sx={{ flex: 1, height: 1, bgcolor: 'rgba(255,255,255,0.08)' }} />
-            <Typography variant="caption" sx={{ color: 'rgba(233,236,245,0.4)', fontSize: '0.75rem' }}>
+            <Typography
+              variant="caption"
+              sx={{ color: 'rgba(233,236,245,0.4)', fontSize: '0.75rem' }}
+            >
               or
             </Typography>
             <Box sx={{ flex: 1, height: 1, bgcolor: 'rgba(255,255,255,0.08)' }} />
@@ -489,7 +299,7 @@ export default function SignUp() {
               variant="outlined"
               size="small"
               startIcon={<GoogleIcon sx={{ fontSize: 18 }} />}
-              onClick={handleGoogleSignIn}
+              onClick={() => {}}
               sx={{
                 py: 1,
                 textTransform: 'none',
@@ -511,7 +321,7 @@ export default function SignUp() {
               variant="outlined"
               size="small"
               startIcon={<FacebookIcon sx={{ fontSize: 18 }} />}
-              onClick={handleFacebookSignIn}
+              onClick={() => {}}
               sx={{
                 py: 1,
                 textTransform: 'none',

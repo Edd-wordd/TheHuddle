@@ -120,7 +120,6 @@ const UsersDashboard = ({ onManagePicks = () => {}, onViewLeaderboard = () => {}
     lastWeekRecord: '10-6',
     seasonRecord: '8-4',
     currentRank: '2 of 12',
-    streak: { type: 'hot', label: 'Current streak: 3 wins' },
   }
 
   const nextGame = {
@@ -181,7 +180,6 @@ const UsersDashboard = ({ onManagePicks = () => {}, onViewLeaderboard = () => {}
             lastWeekRecord={recap.lastWeekRecord}
             seasonRecord={recap.seasonRecord}
             currentRank={recap.currentRank}
-            streak={recap.streak}
           />
         </Grid>
         <Grid item xs={12} md={6}>

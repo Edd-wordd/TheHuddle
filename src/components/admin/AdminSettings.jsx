@@ -29,7 +29,7 @@ function SectionLabel({ children }) {
   )
 }
 
-// Mock config — wire to Firebase later
+// Mock config — wire to Supabase later
 const config = {
   league: {
     leagueName: 'Family NFL Picks',
@@ -79,8 +79,7 @@ const config = {
   },
 }
 
-const STANDINGS_RECALC_WARNING =
-  '⚠ Changing these settings will require standings recalculation.'
+const STANDINGS_RECALC_WARNING = '⚠ Changing these settings will require standings recalculation.'
 
 function ConfigRow({ label, value, mono }) {
   return (
@@ -181,7 +180,11 @@ function SectionHeader({ title, description, impactBadge }) {
     >
       <Box>
         <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap>
-          <Typography variant="subtitle1" fontWeight={700} sx={{ color: 'rgba(233,236,245,0.95)', fontSize: '1rem' }}>
+          <Typography
+            variant="subtitle1"
+            fontWeight={700}
+            sx={{ color: 'rgba(233,236,245,0.95)', fontSize: '1rem' }}
+          >
             {title}
           </Typography>
           {impactBadge && (
@@ -199,7 +202,11 @@ function SectionHeader({ title, description, impactBadge }) {
           )}
         </Stack>
         {description && (
-          <Typography variant="caption" color="rgba(233,236,245,0.5)" sx={{ display: 'block', mt: 0.25 }}>
+          <Typography
+            variant="caption"
+            color="rgba(233,236,245,0.5)"
+            sx={{ display: 'block', mt: 0.25 }}
+          >
             {description}
           </Typography>
         )}
@@ -237,7 +244,10 @@ function WarningCallout() {
       }}
     >
       <WarningAmberIcon sx={{ fontSize: 18, color: '#ffb74d', mt: 0.15, flexShrink: 0 }} />
-      <Typography variant="caption" sx={{ color: 'rgba(233,236,245,0.8)', fontSize: '0.8rem', lineHeight: 1.4 }}>
+      <Typography
+        variant="caption"
+        sx={{ color: 'rgba(233,236,245,0.8)', fontSize: '0.8rem', lineHeight: 1.4 }}
+      >
         {STANDINGS_RECALC_WARNING}
       </Typography>
     </Box>
@@ -288,11 +298,7 @@ export default function AdminSettings() {
           <CardContent sx={{ py: 2.5, px: 3 }}>
             <Grid container spacing={3} alignItems="center">
               <Grid item xs={12} md={4}>
-                <Typography
-                  variant="h6"
-                  fontWeight={700}
-                  sx={{ color: '#e9ecf5', mb: 0.25 }}
-                >
+                <Typography variant="h6" fontWeight={700} sx={{ color: '#e9ecf5', mb: 0.25 }}>
                   {config.league.leagueName}
                 </Typography>
                 <Typography variant="body2" color="rgba(233,236,245,0.6)">
@@ -300,7 +306,15 @@ export default function AdminSettings() {
                 </Typography>
               </Grid>
               <Grid item xs={6} sm={4} md={2}>
-                <Typography variant="caption" sx={{ color: 'rgba(233,236,245,0.5)', fontSize: '0.7rem', display: 'block', mb: 0.25 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'rgba(233,236,245,0.5)',
+                    fontSize: '0.7rem',
+                    display: 'block',
+                    mb: 0.25,
+                  }}
+                >
                   League status
                 </Typography>
                 <Chip
@@ -316,7 +330,15 @@ export default function AdminSettings() {
                 />
               </Grid>
               <Grid item xs={6} sm={4} md={2}>
-                <Typography variant="caption" sx={{ color: 'rgba(233,236,245,0.5)', fontSize: '0.7rem', display: 'block', mb: 0.25 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'rgba(233,236,245,0.5)',
+                    fontSize: '0.7rem',
+                    display: 'block',
+                    mb: 0.25,
+                  }}
+                >
                   Current week
                 </Typography>
                 <Typography variant="body1" fontWeight={600} sx={{ color: '#e9ecf5' }}>
@@ -324,13 +346,29 @@ export default function AdminSettings() {
                 </Typography>
               </Grid>
               <Grid item xs={6} sm={4} md={2}>
-                <Typography variant="caption" sx={{ color: 'rgba(233,236,245,0.5)', fontSize: '0.7rem', display: 'block', mb: 0.25 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'rgba(233,236,245,0.5)',
+                    fontSize: '0.7rem',
+                    display: 'block',
+                    mb: 0.25,
+                  }}
+                >
                   Picks locked
                 </Typography>
                 <StatePill enabled={config.status.picksLocked} />
               </Grid>
               <Grid item xs={6} sm={4} md={2}>
-                <Typography variant="caption" sx={{ color: 'rgba(233,236,245,0.5)', fontSize: '0.7rem', display: 'block', mb: 0.25 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'rgba(233,236,245,0.5)',
+                    fontSize: '0.7rem',
+                    display: 'block',
+                    mb: 0.25,
+                  }}
+                >
                   Standings auto-calc
                 </Typography>
                 <StatePill enabled={config.status.standingsAutoCalc} />
@@ -345,10 +383,7 @@ export default function AdminSettings() {
         <SectionLabel>League</SectionLabel>
         <Card sx={{ ...glassQuiet }}>
           <CardContent sx={{ py: 2, px: 2.5 }}>
-            <SectionHeader
-              title="League"
-              description="Core league identity and metadata."
-            />
+            <SectionHeader title="League" description="Core league identity and metadata." />
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6} md={4}>
                 <ConfigRow label="League Name" value={config.league.leagueName} />
@@ -411,7 +446,10 @@ export default function AdminSettings() {
             <WarningCallout />
             <Grid container spacing={3} sx={{ mt: 1 }}>
               <Grid item xs={12} sm={6} md={4}>
-                <ConfigRow label="Points per correct pick" value={config.scoring.pointsPerCorrectPick} />
+                <ConfigRow
+                  label="Points per correct pick"
+                  value={config.scoring.pointsPerCorrectPick}
+                />
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
                 <ConfigRow label="Bonus points" value={config.scoring.bonusPoints} />
@@ -452,10 +490,7 @@ export default function AdminSettings() {
         <SectionLabel>Season</SectionLabel>
         <Card sx={{ ...glassQuiet }}>
           <CardContent sx={{ py: 2, px: 2.5 }}>
-            <SectionHeader
-              title="Season"
-              description="Week counts and playoff settings."
-            />
+            <SectionHeader title="Season" description="Week counts and playoff settings." />
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6} md={2}>
                 <ConfigRow label="Total weeks" value={config.season.totalWeeks} />
@@ -488,13 +523,22 @@ export default function AdminSettings() {
             />
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6} md={3}>
-                <ConfigRowWithPill label="Standings auto-calculate" value={config.systemState.standingsAutoCalculate} />
+                <ConfigRowWithPill
+                  label="Standings auto-calculate"
+                  value={config.systemState.standingsAutoCalculate}
+                />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <ConfigRowWithPill label="Manual override allowed" value={config.systemState.manualOverrideAllowed} />
+                <ConfigRowWithPill
+                  label="Manual override allowed"
+                  value={config.systemState.manualOverrideAllowed}
+                />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <ConfigRowWithPill label="Admin actions logged" value={config.systemState.adminActionsLogged} />
+                <ConfigRowWithPill
+                  label="Admin actions logged"
+                  value={config.systemState.adminActionsLogged}
+                />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
                 <ConfigRowWithPill label="League locked" value={config.systemState.leagueLocked} />
@@ -509,13 +553,13 @@ export default function AdminSettings() {
         <SectionLabel>Audit</SectionLabel>
         <Card sx={{ ...glassQuiet }}>
           <CardContent sx={{ py: 2, px: 2.5 }}>
-            <SectionHeader
-              title="Audit"
-              description="Last configuration change."
-            />
+            <SectionHeader title="Audit" description="Last configuration change." />
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6} md={4}>
-                <ConfigRow label="Last config change date" value={config.audit.lastConfigChangeDate} />
+                <ConfigRow
+                  label="Last config change date"
+                  value={config.audit.lastConfigChangeDate}
+                />
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
                 <ConfigRow label="Changed by" value={config.audit.changedBy} />

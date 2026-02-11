@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React from 'react'
 import {
   Box,
   Button,
@@ -14,16 +13,6 @@ import {
 import SportsFootballIcon from '@mui/icons-material/SportsFootball'
 import GoogleIcon from '@mui/icons-material/Google'
 import FacebookIcon from '@mui/icons-material/Facebook'
-import {
-  getAuth,
-  FacebookAuthProvider,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-} from 'firebase/auth'
-import { processUserData } from '../utilis/ProcessUserData'
 import { glassyCard, mainBackground } from '../../styles/adminStyles'
 import Footer from '../layout/Footer'
 
@@ -52,118 +41,11 @@ const inputSx = {
   '& .MuiInputBase-input': { color: '#e9ecf5' },
 }
 
+const handleSignIn = () => {
+  console.log('Sign in')
+}
+
 export default function SignIn() {
-  const navigate = useNavigate()
-  const [userCredentials, setUserCredentials] = useState({ email: '', password: '' })
-  const [errorMessage, setErrorMessage] = useState('')
-  const [isSocialMediaSigningIn, setIsSocialMediaSigningIn] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const handleGoogleSignIn = async (e) => {
-    e.preventDefault()
-    setIsSocialMediaSigningIn(true)
-    const provider = new GoogleAuthProvider()
-    try {
-      const result = await signInWithPopup(getAuth(), provider)
-      await processUserData(result.user)
-      navigate('/dashboard')
-    } catch (error) {
-      console.error('Error during sign-in with popup:', error)
-      setErrorMessage('Error during sign-in. Please try again.')
-      setIsSocialMediaSigningIn(false)
-    }
-  }
-
-  const handleFacebookSignIn = async (e) => {
-    e.preventDefault()
-    setIsSocialMediaSigningIn(true)
-    const provider = new FacebookAuthProvider()
-    try {
-      const result = await signInWithPopup(getAuth(), provider)
-      await processUserData(result.user)
-      navigate('/dashboard')
-    } catch (error) {
-      console.error('Error during sign-in with popup:', error)
-      setErrorMessage('Error during sign-in. Please try again.')
-      setIsSocialMediaSigningIn(false)
-    }
-  }
-
-  useEffect(() => {
-    const auth = getAuth()
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        await processUserData(user)
-        navigate('/dashboard')
-      }
-    })
-    return () => {
-      if (unsubscribe) unsubscribe()
-    }
-  }, [navigate])
-
-  useEffect(() => {
-    let timer
-    if (errorMessage) {
-      timer = setTimeout(() => setErrorMessage(''), 3000)
-    }
-    return () => clearTimeout(timer)
-  }, [errorMessage])
-
-  const handleChange = (e) => {
-    const { value, name } = e.target
-    setUserCredentials({ ...userCredentials, [name]: value })
-  }
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/
-
-    if (userCredentials.email === '' || userCredentials.password === '') {
-      setErrorMessage('Email or password is empty')
-      setIsSubmitting(false)
-      return
-    }
-    if (!emailRegex.test(userCredentials.email)) {
-      setErrorMessage('Invalid email address')
-      setIsSubmitting(false)
-      return
-    }
-
-    setIsSubmitting(true)
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        getAuth(),
-        userCredentials.email,
-        userCredentials.password,
-      )
-      const user = userCredential.user
-
-      if (!user.emailVerified) {
-        await signOut(getAuth())
-        setErrorMessage('Please verify your email before logging in.')
-        setIsSubmitting(false)
-        return
-      }
-
-      await processUserData(user)
-      navigate('/dashboard')
-    } catch (error) {
-      console.error('Error during email sign-in:', error)
-      if (error.code === 'auth/user-not-found') {
-        setErrorMessage('No user found with this email.')
-      } else if (error.code === 'auth/wrong-password') {
-        setErrorMessage('Incorrect password.')
-      } else if (error.code === 'auth/invalid-credential') {
-        setErrorMessage('Invalid email or password.')
-      } else {
-        setErrorMessage('Error during sign-in. Please try again.')
-      }
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
   return (
     <Box
       sx={{
@@ -183,7 +65,7 @@ export default function SignIn() {
           zIndex: (theme) => theme.zIndex.drawer + 1,
           bgcolor: 'rgba(0,0,0,0.6)',
         }}
-        open={isSubmitting || isSocialMediaSigningIn}
+        open={false}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -218,7 +100,7 @@ export default function SignIn() {
               letterSpacing: '-0.02em',
             }}
           >
-            Sign in to EchoSphere
+            Sign in to The Huddle
           </Typography>
           <Typography
             variant="body2"
@@ -232,8 +114,8 @@ export default function SignIn() {
           </Typography>
         </Stack>
 
-        <Box component="form" noValidate onSubmit={handleSubmit}>
-          {errorMessage && (
+        <Box component="form" noValidate onSubmit={() => {}}>
+          {false && (
             <Alert
               severity="error"
               sx={{
@@ -244,7 +126,7 @@ export default function SignIn() {
                 border: '1px solid rgba(255,82,82,0.2)',
               }}
             >
-              {errorMessage}
+              {false}
             </Alert>
           )}
 
@@ -260,7 +142,7 @@ export default function SignIn() {
               autoFocus
               variant="outlined"
               size="small"
-              onChange={handleChange}
+              onChange={() => {}}
               sx={inputSx}
             />
             <TextField
@@ -273,7 +155,7 @@ export default function SignIn() {
               autoComplete="current-password"
               variant="outlined"
               size="small"
-              onChange={handleChange}
+              onChange={() => {}}
               sx={inputSx}
             />
           </Stack>
@@ -297,6 +179,7 @@ export default function SignIn() {
                 borderColor: 'rgba(255,255,255,0.18)',
               },
             }}
+            onClick={handleSignIn}
           >
             Sign in
           </Button>
@@ -352,7 +235,7 @@ export default function SignIn() {
               variant="outlined"
               size="small"
               startIcon={<GoogleIcon sx={{ fontSize: 18 }} />}
-              onClick={handleGoogleSignIn}
+              onClick={() => {}}
               sx={{
                 py: 1,
                 textTransform: 'none',
@@ -374,7 +257,7 @@ export default function SignIn() {
               variant="outlined"
               size="small"
               startIcon={<FacebookIcon sx={{ fontSize: 18 }} />}
-              onClick={handleFacebookSignIn}
+              onClick={() => {}}
               sx={{
                 py: 1,
                 textTransform: 'none',
