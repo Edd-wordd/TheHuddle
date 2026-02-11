@@ -1,7 +1,4 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { auth } from '../../firebase/firebase'
-import { sendPasswordResetEmail } from 'firebase/auth'
 import {
   TextField,
   Button,
@@ -44,30 +41,6 @@ const inputSx = {
 
 function ForgotPassword() {
   const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState('')
-  const [error, setError] = useState('')
-  const navigate = useNavigate()
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-    setSuccess('')
-
-    try {
-      await sendPasswordResetEmail(auth, email)
-      setSuccess('Password reset link sent! Please check your email.')
-    } catch (err) {
-      setError(err.message || 'Error sending password reset email.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleBackToSignIn = () => {
-    navigate('/signin')
-  }
 
   return (
     <Box
@@ -90,7 +63,7 @@ function ForgotPassword() {
           zIndex: (theme) => theme.zIndex.drawer + 1,
           bgcolor: 'rgba(0,0,0,0.6)',
         }}
-        open={loading}
+        open={false}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -139,8 +112,8 @@ function ForgotPassword() {
           </Typography>
         </Stack>
 
-        <Box component="form" noValidate onSubmit={handleSubmit}>
-          {success && (
+        <Box component="form" noValidate onSubmit={() => {}}>
+          {false && (
             <Alert
               severity="success"
               sx={{
@@ -151,10 +124,10 @@ function ForgotPassword() {
                 border: '1px solid rgba(0,200,83,0.2)',
               }}
             >
-              {success}
+              {false}
             </Alert>
           )}
-          {error && (
+          {false && (
             <Alert
               severity="error"
               sx={{
@@ -165,7 +138,7 @@ function ForgotPassword() {
                 border: '1px solid rgba(255,82,82,0.2)',
               }}
             >
-              {error}
+              {false}
             </Alert>
           )}
 
@@ -178,7 +151,7 @@ function ForgotPassword() {
             size="small"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            disabled={loading}
+            disabled={false}
             autoFocus
             sx={inputSx}
           />
@@ -188,7 +161,7 @@ function ForgotPassword() {
             variant="contained"
             fullWidth
             size="medium"
-            disabled={loading}
+            disabled={false}
             sx={{
               mt: 2,
               py: 1.25,
@@ -209,26 +182,21 @@ function ForgotPassword() {
               },
             }}
           >
-            {loading ? 'Sending...' : 'Send reset link'}
+            {false ? 'Sending...' : 'Send reset link'}
           </Button>
 
-          <Stack
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-            sx={{ mt: 2 }}
-          >
+          <Stack direction="row" justifyContent="center" alignItems="center" sx={{ mt: 2 }}>
             <Link
               component="button"
               type="button"
               variant="body2"
-              onClick={handleBackToSignIn}
-              disabled={loading}
+              onClick={() => {}}
+              disabled={false}
               sx={{
                 color: 'rgba(233,236,245,0.55)',
                 fontSize: '0.8rem',
                 textDecoration: 'none',
-                cursor: loading ? 'not-allowed' : 'pointer',
+                cursor: false ? 'not-allowed' : 'pointer',
                 '&:hover': { color: 'rgba(183,148,246,0.9)', textDecoration: 'underline' },
                 '&:disabled': { color: 'rgba(233,236,245,0.3)', cursor: 'not-allowed' },
               }}

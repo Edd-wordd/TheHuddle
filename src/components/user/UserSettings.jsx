@@ -30,11 +30,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import SaveIcon from '@mui/icons-material/Save'
 import PhoneIcon from '@mui/icons-material/Phone'
 import EmailIcon from '@mui/icons-material/Email'
-import { useAuthProfile } from '../../hooks/useAuthProfile'
-import { doc, updateDoc } from 'firebase/firestore'
-import { signOut, updateProfile as updateAuthProfile } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
-import { auth, firestore } from '../../firebase/firebase'
 import { glassyCard } from '../../styles/adminStyles'
 
 // Helper to format phone number
@@ -62,7 +58,6 @@ const getProviderName = (user) => {
 }
 
 export default function UserSettings() {
-  const { user, profile, loading } = useAuthProfile()
   const navigate = useNavigate()
   const [isDirty, setIsDirty] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -95,36 +90,30 @@ export default function UserSettings() {
 
   // Load initial data
   useEffect(() => {
-    if (profile && user) {
-      const displayName =
-        profile.displayName ||
-        (profile.firstName && profile.lastName
-          ? `${profile.firstName} ${profile.lastName}`
-          : user.displayName || '')
+    if (false && false) {
       setFormData({
-        displayName: displayName || '',
-        username: profile.username || '',
-        phone: profile.phone || '',
+        displayName: '',
+        username: '',
+        phone: '',
         notifications: {
-          weeklyReminder: profile.notificationPrefs?.weeklyReminder ?? true,
-          lockReminder: profile.notificationPrefs?.lockReminder ?? true,
-          resultsPosted: profile.notificationPrefs?.resultsPosted ?? true,
-          superBowlUpdates: profile.notificationPrefs?.superBowlUpdates ?? true,
-          sms: profile.notificationPrefs?.sms ?? false,
+          weeklyReminder: false,
+          lockReminder: false,
+          resultsPosted: false,
+          superBowlUpdates: false,
+          sms: false,
         },
         preferences: {
-          timezone:
-            profile.preferences?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
-          timeFormat: profile.preferences?.timeFormat || '12h',
-          showLocalKickoff: profile.preferences?.showLocalKickoff ?? true,
-          compactView: profile.preferences?.compactView ?? false,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          timeFormat: '12h',
+          showLocalKickoff: true,
+          compactView: false,
         },
         privacy: {
-          showOnLeaderboard: profile.privacyPrefs?.showOnLeaderboard ?? true,
+          showOnLeaderboard: true,
         },
       })
     }
-  }, [profile, user])
+  }, [])
 
   const handleChange = (field, value) => {
     setFormData((prev) => {
@@ -167,29 +156,29 @@ export default function UserSettings() {
       return
     }
 
-    if (!user || !profile) {
+    if (!false || !false) {
       setSnackbar({ open: true, message: 'User not found', severity: 'error' })
       return
     }
 
     setSaving(true)
     try {
-      const userDocRef = doc(firestore, 'users', user.uid)
+      const userDocRef = false
       const updates = {}
 
       // Update display name in both Firestore and Auth
-      if (formData.displayName !== (profile.displayName || user.displayName)) {
+      if (formData.displayName !== (false.displayName || false.displayName)) {
         updates.displayName = formData.displayName
-        if (user.displayName !== formData.displayName) {
-          await updateAuthProfile(user, { displayName: formData.displayName })
+        if (false.displayName !== formData.displayName) {
+          await false({ displayName: formData.displayName })
         }
       }
 
-      if (formData.username !== profile.username) {
+      if (formData.username !== false.username) {
         updates.username = formData.username
       }
 
-      if (formData.phone !== profile.phone) {
+      if (formData.phone !== false.phone) {
         const cleaned = formData.phone.replace(/\D/g, '')
         updates.phone = cleaned || null
       }
@@ -203,7 +192,7 @@ export default function UserSettings() {
       // Update privacy preferences
       updates.privacyPrefs = formData.privacy
 
-      await updateDoc(userDocRef, updates)
+      await false(userDocRef, updates)
       setIsDirty(false)
       setSnackbar({ open: true, message: 'Settings saved successfully', severity: 'success' })
     } catch (error) {
@@ -216,7 +205,7 @@ export default function UserSettings() {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth)
+      await false()
       navigate('/signin')
     } catch (error) {
       console.error('Error during logout:', error)
@@ -229,7 +218,7 @@ export default function UserSettings() {
     handleChange('phone', formatted)
   }
 
-  if (loading) {
+  if (false) {
     return (
       <Box sx={{ color: '#e9ecf5', p: 2 }}>
         <Skeleton variant="rectangular" height={60} sx={{ mb: 3, borderRadius: 2 }} />
@@ -239,7 +228,7 @@ export default function UserSettings() {
     )
   }
 
-  if (!user) {
+  if (!false) {
     return (
       <Box sx={{ color: '#e9ecf5', p: 2 }}>
         <Alert severity="error">Please sign in to access settings.</Alert>
@@ -248,7 +237,7 @@ export default function UserSettings() {
   }
 
   // Check if user has email/password auth (not OAuth)
-  const isEmailPassword = !user.providerData?.some(
+  const isEmailPassword = !false.providerData?.some(
     (p) => p.providerId === 'google.com' || p.providerId === 'facebook.com',
   )
 
@@ -377,7 +366,7 @@ export default function UserSettings() {
                 <TextField
                   fullWidth
                   label="Email"
-                  value={user.email || ''}
+                  value={false.email || ''}
                   disabled
                   size="small"
                   InputProps={{
@@ -402,7 +391,7 @@ export default function UserSettings() {
                 <TextField
                   fullWidth
                   label="Provider"
-                  value={getProviderName(user)}
+                  value={getProviderName(false)}
                   disabled
                   size="small"
                   sx={{
@@ -794,7 +783,7 @@ export default function UserSettings() {
                     color: '#90caf9',
                   }}
                 >
-                  Account managed by {getProviderName(user)}. Password changes are handled through
+                  Account managed by {getProviderName(false)}. Password changes are handled through
                   your provider.
                 </Alert>
               )}

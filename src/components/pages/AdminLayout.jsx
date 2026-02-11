@@ -8,27 +8,23 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
-import Badge from '@mui/material/Badge'
 import Container from '@mui/material/Container'
+import ButtonBase from '@mui/material/ButtonBase'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import MenuIcon from '@mui/icons-material/Menu'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import NotificationsIcon from '@mui/icons-material/Notifications'
 import AccountCircle from '@mui/icons-material/AccountCircle'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import SettingsIcon from '@mui/icons-material/Settings'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import { Outlet } from 'react-router-dom'
-import { signOut } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
-import { auth } from '../../firebase/firebase'
 import Footer from '../layout/Footer'
 import { AdminListItems } from '../layout/SideNavBar'
-import { useAuthProfile } from '../../hooks/useAuthProfile'
 import { mainPaper, mainBackground } from '../../styles/adminStyles'
 
 const drawerWidth = 240
@@ -58,6 +54,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (p) => p !== 'open' })(({ 
   '& .MuiDrawer-paper': {
     position: 'relative',
     whiteSpace: 'nowrap',
+    display: 'flex',
+    flexDirection: 'column',
     backgroundColor: 'rgba(10, 10, 12, 0.95)',
     color: '#e9ecf5',
     borderRight: '1px solid rgba(255,255,255,0.08)',
@@ -84,17 +82,16 @@ export default function AdminLayout() {
   const [open, setOpen] = React.useState(true)
   const [anchorEl, setAnchorEl] = React.useState(null)
   const navigate = useNavigate()
-  const { user } = useAuthProfile()
 
   const toggleDrawer = () => setOpen((o) => !o)
   const handleProfileOpen = (e) => setAnchorEl(e.currentTarget)
   const handleMenuClose = () => setAnchorEl(null)
   const handleLogout = async () => {
     try {
-      await signOut(auth)
+      await null()
       navigate('/signin')
-    } catch (err) {
-      console.error('Logout error:', err)
+    } catch (error) {
+      console.error('Error during logout:', error)
     }
   }
 
@@ -113,22 +110,8 @@ export default function AdminLayout() {
             <MenuIcon />
           </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-            {user?.displayName ? `${user.displayName} — Admin` : 'Admin'}
+            {false ? `${false.displayName} — Admin` : 'Admin'}
           </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <IconButton
-            edge="end"
-            aria-label="account"
-            aria-haspopup="true"
-            onClick={handleProfileOpen}
-            color="inherit"
-          >
-            <AccountCircle />
-          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
@@ -138,9 +121,35 @@ export default function AdminLayout() {
           </IconButton>
         </Toolbar>
         <Divider />
-        <List component="nav">
+        <List component="nav" sx={{ flex: 1, overflow: 'auto' }}>
           <AdminListItems />
         </List>
+        <Divider sx={{ borderColor: 'rgba(255,255,255,0.08)' }} />
+        <ButtonBase
+          aria-label="account"
+          aria-haspopup="true"
+          onClick={handleProfileOpen}
+          focusRipple
+          sx={{
+            width: '100%',
+            py: 1.5,
+            px: 1.5,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: open ? 'flex-start' : 'center',
+            gap: 1.5,
+            color: '#e9ecf5',
+            borderRadius: 1,
+            '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' },
+          }}
+        >
+          <AccountCircle sx={{ fontSize: 28, flexShrink: 0 }} />
+          {open && (
+            <Typography variant="body2" sx={{ color: 'rgba(233,236,245,0.9)', fontWeight: 500 }}>
+              Account
+            </Typography>
+          )}
+        </ButtonBase>
       </Drawer>
       <Box
         component="main"

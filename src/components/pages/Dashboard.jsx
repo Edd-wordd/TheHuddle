@@ -8,14 +8,12 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
-import Badge from '@mui/material/Badge'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import MenuIcon from '@mui/icons-material/Menu'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import NotificationsIcon from '@mui/icons-material/Notifications'
 import { AccountCircle } from '@mui/icons-material'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
@@ -23,13 +21,11 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import SettingsIcon from '@mui/icons-material/Settings'
 import Footer from '../layout/Footer'
-import { signOut } from 'firebase/auth'
 import { useNavigate, NavLink } from 'react-router-dom'
-import { auth } from '../../firebase/firebase'
-import { useAuthProfile } from '../../hooks/useAuthProfile'
 import { MainListItems, StyledListItemButton } from '../layout/SideNavBar'
 import ListSubheader from '@mui/material/ListSubheader'
 import ListItemText from '@mui/material/ListItemText'
+import ButtonBase from '@mui/material/ButtonBase'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import Rules from '../user/Rules'
 import UsersDashboard from '../user/UsersDashboard'
@@ -73,6 +69,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
       borderRight: '1px solid rgba(255,255,255,0.08)',
       backdropFilter: 'blur(10px)',
       width: drawerWidth,
+      display: 'flex',
+      flexDirection: 'column',
       transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.enteringScreen,
@@ -98,7 +96,6 @@ export default function Dashboard() {
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [selectedComponent, setSelectedComponent] = React.useState('Dashboard')
   const navigate = useNavigate()
-  const { user, isAdmin } = useAuthProfile()
 
   // Toggle the drawer
   const toggleDrawer = () => {
@@ -118,7 +115,7 @@ export default function Dashboard() {
   // Handle logout
   const handleLogout = async () => {
     try {
-      await signOut(auth)
+      await false()
       navigate('/signin')
     } catch (error) {
       console.error('Error during logout:', error)
@@ -139,7 +136,7 @@ export default function Dashboard() {
       keepMounted
       transformOrigin={{
         vertical: 'top',
-        horizontal: 'right',
+        horizontal: 'left',
       }}
       open={isMenuOpen}
       onClose={handleMenuClose}
@@ -211,23 +208,8 @@ export default function Dashboard() {
             <MenuIcon />
           </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-            {user ? `${user.displayName}'s Dashboard` : 'Dashboard'}
+            {false ? `${false.displayName}'s Dashboard` : 'Dashboard'}
           </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <IconButton
-            edge="end"
-            aria-label="account of current user"
-            aria-controls={menuId}
-            aria-haspopup="true"
-            onClick={handleProfileMenuOpen}
-            color="inherit"
-          >
-            <AccountCircle />
-          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
@@ -244,9 +226,9 @@ export default function Dashboard() {
           </IconButton>
         </Toolbar>
         <Divider />
-        <List component="nav">
+        <List component="nav" sx={{ flex: 1, overflow: 'auto' }}>
           <MainListItems onSelectItem={setSelectedComponent} />
-          {isAdmin && (
+          {false && (
             <>
               <Divider sx={{ my: 1 }} />
               <ListSubheader component="div" inset sx={{ color: 'rgba(233,236,245,0.7)' }}>
@@ -261,6 +243,33 @@ export default function Dashboard() {
             </>
           )}
         </List>
+        <Divider sx={{ borderColor: 'rgba(255,255,255,0.08)' }} />
+        <ButtonBase
+          aria-label="account of current user"
+          aria-controls={menuId}
+          aria-haspopup="true"
+          onClick={handleProfileMenuOpen}
+          focusRipple
+          sx={{
+            width: '100%',
+            py: 1.5,
+            px: 1.5,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: open ? 'flex-start' : 'center',
+            gap: 1.5,
+            color: '#e9ecf5',
+            borderRadius: 1,
+            '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' },
+          }}
+        >
+          <AccountCircle sx={{ fontSize: 28, flexShrink: 0 }} />
+          {open && (
+            <Typography variant="body2" sx={{ color: 'rgba(233,236,245,0.9)', fontWeight: 500 }}>
+              Account
+            </Typography>
+          )}
+        </ButtonBase>
       </Drawer>
       <Box
         component="main"

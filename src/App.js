@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import SignUp from './components/pages/SignUp'
 import SignIn from './components/pages/SignIn'
 import Dashboard from './components/pages/Dashboard'
-import EmailVerificationHandler from './components/admin/EmailVerificationHandler'
 import AdminGuard from './components/admin/AdminGuard'
 import ForgotPassword from './components/pages/ForgotPassword'
 import Access from './components/pages/Access'
@@ -24,14 +23,7 @@ function App() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route
-          path="/dashboard"
-          element={
-            <EmailVerificationHandler>
-              <Dashboard />
-            </EmailVerificationHandler>
-          }
-        />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route
           path="/admin"
           element={

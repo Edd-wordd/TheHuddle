@@ -34,7 +34,6 @@ import SearchIcon from '@mui/icons-material/Search'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import SportsFootballIcon from '@mui/icons-material/SportsFootball'
 import { glassyCard } from '../../styles/adminStyles'
-import { useAuthProfile } from '../../hooks/useAuthProfile'
 
 // Mock leaderboard data
 const mockLeaderboardData = {
@@ -805,15 +804,9 @@ const YourPositionRow = ({ entry, isTable, leaderPoints }) => {
 const LeaderboardPage = () => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const { user } = useAuthProfile()
-
   const [viewType, setViewType] = useState('season') // 'season' or 'week'
   const [sortBy, setSortBy] = useState('points') // 'points' or 'wins'
   const [searchQuery, setSearchQuery] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  // Mock current user ID - replace with actual auth user ID when wired
-  const currentUserId = user?.uid || 'u1'
 
   const leaderboardData = useMemo(() => {
     const data = viewType === 'week' ? mockLeaderboardData.week : mockLeaderboardData.season
@@ -851,23 +844,23 @@ const LeaderboardPage = () => {
   }, [viewType, sortBy, searchQuery])
 
   const currentUser = useMemo(() => {
-    return leaderboardData.find((entry) => entry.userId === currentUserId)
-  }, [leaderboardData, currentUserId])
+    return leaderboardData.find((entry) => entry.userId === false)
+  }, [leaderboardData])
 
   const top10 = useMemo(() => {
     return leaderboardData.slice(0, 10)
   }, [leaderboardData])
 
   const isUserInTop10 = useMemo(() => {
-    return top10.some((entry) => entry.userId === currentUserId)
-  }, [top10, currentUserId])
+    return top10.some((entry) => entry.userId === false)
+  }, [top10])
 
   const leaderPoints = useMemo(() => {
     if (leaderboardData.length === 0) return undefined
     return leaderboardData[0]?.points
   }, [leaderboardData])
 
-  if (loading) {
+  if (false) {
     return (
       <Container maxWidth="lg" sx={{ py: 4, color: '#e9ecf5' }}>
         <Stack spacing={2}>
@@ -1046,7 +1039,7 @@ const LeaderboardPage = () => {
                 <LeaderboardListRow
                   key={entry.userId}
                   entry={entry}
-                  isCurrent={entry.userId === currentUserId}
+                  isCurrent={entry.userId === false}
                   leaderPoints={leaderPoints}
                 />
               ))}
@@ -1126,7 +1119,7 @@ const LeaderboardPage = () => {
                     <LeaderboardTableRow
                       key={entry.userId}
                       entry={entry}
-                      isCurrent={entry.userId === currentUserId}
+                      isCurrent={entry.userId === false}
                       leaderPoints={leaderPoints}
                     />
                   ))}

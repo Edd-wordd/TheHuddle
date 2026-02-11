@@ -1,8 +1,6 @@
 import React from 'react'
 import { Card, CardContent, Typography, Stack } from '@mui/material'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
-import WhatshotIcon from '@mui/icons-material/Whatshot'
-import AcUnitIcon from '@mui/icons-material/AcUnit'
 import { glassyCard } from '../../styles/adminStyles'
 
 const StatRow = ({ label, value }) => (
@@ -19,7 +17,7 @@ const StatRow = ({ label, value }) => (
   </Stack>
 )
 
-const UserRecapCard = ({ lastWeekRecord, seasonRecord, currentRank, streak }) => (
+const UserRecapCard = ({ lastWeekRecord, seasonRecord, currentRank }) => (
   <Card sx={glassyCard}>
     <CardContent sx={{ color: '#e9ecf5', py: 2.5, px: 2.5 }}>
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
@@ -31,30 +29,6 @@ const UserRecapCard = ({ lastWeekRecord, seasonRecord, currentRank, streak }) =>
       <StatRow label="Last week" value={lastWeekRecord} />
       <StatRow label="Season" value={seasonRecord} />
       <StatRow label="Current rank" value={currentRank} />
-      {streak && (
-        <Stack
-          direction="row"
-          alignItems="center"
-          spacing={1}
-          sx={{ mt: 1.5, pt: 1.5, borderTop: '1px solid rgba(255,255,255,0.06)' }}
-        >
-          {streak.type === 'hot' ? (
-            <WhatshotIcon sx={{ fontSize: 18, color: '#ff8a80' }} />
-          ) : (
-            <AcUnitIcon sx={{ fontSize: 18, color: '#81c784' }} />
-          )}
-          <Typography
-            variant="body2"
-            sx={{
-              color: streak.type === 'hot' ? '#ff8a80' : '#81c784',
-              fontSize: '0.8125rem',
-              fontWeight: 500,
-            }}
-          >
-            {streak.label}
-          </Typography>
-        </Stack>
-      )}
     </CardContent>
   </Card>
 )
